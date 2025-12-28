@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lethal Outdoors: Entity Soundboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0c;
+            --text-neon: #45f145;
+            --text-amber: #ffaa00;
+            --text-error: #ff3333;
+            --panel-bg: rgba(69, 241, 69, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-neon);
+            font-family: 'Roboto Mono', monospace;
+            margin: 0; padding: 0;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* Scanline Overlay */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 118, 0.06));
+            z-index: 999;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+        }
+
+        h1, h2 { font-family: 'VT323', monospace; text-transform: uppercase; }
+
+        .terminal-btn {
+            border: 1px solid var(--text-neon);
+            padding: 1rem;
+            text-align: center;
+            background: var(--panel-bg);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .terminal-btn:hover { background: rgba(69, 241, 69, 0.15); }
+        .terminal-btn:active { background: var(--text-neon); color: black; }
+
+        .sound-btn {
+            border: 2px solid var(--text-amber);
+            background: rgba(255, 170, 0, 0.05);
+            color: var(--text-amber);
+            padding: 1.5rem 1rem;
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            border-radius: 4px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 5px; position: relative; overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .sound-btn.playing {
+            border-color: var(--text-neon);
+            box-shadow: 0 0 15px var(--text-neon);
+            background: rgba(69, 241, 69, 0.1);
+            color: var(--text-neon);
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0; left: 0; height: 4px;
+            background: var(--text-neon);
+            width: 0%;
+        }
+
+        .hidden { display: none; }
+        .flicker { animation: flicker 3s infinite; }
+        @keyframes flicker {
+            0%, 19%, 22%, 62%, 64%, 70%, 100% { opacity: 1; }
+            20%, 21%, 63%, 65%, 69% { opacity: 0.4; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <header class="border-b border-[var(--text-neon)] pb-4 mb-6">
+        <h1 class="text-4xl text-[var(--text-amber)] flicker">// AUDIO_COMMAND_CENTER_V2.5 //</h1>
+        <div class="flex gap-4 mt-2">
+            <a href="rules.html" class="text-[0.7rem] text-white hover:text-[var(--text-neon)] underline font-bold uppercase">[ View Rules ]</a>
+            <a href="terminal.html" class="text-[0.7rem] text-white hover:text-[var(--text-neon)] underline font-bold uppercase">[ GM Terminal ]</a>
+        </div>
+    </header>
+
+    <div id="selection-view">
+        <h2 class="text-2xl mb-4 text-white text-center">SELECT ENTITY FREQUENCY:</h2>
+        
+        <div class="mb-8">
+            <h3 class="text-blue-400 mb-2 border-l-4 border-blue-400 pl-2 text-sm uppercase">Indoor Inhabitants</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div class="terminal-btn" onclick="openSoundboard('Jester')">Jester</div>
+                <div class="terminal-btn" onclick="openSoundboard('Hoarding Bug')">Hoarding Bug</div>
+                <div class="terminal-btn" onclick="openSoundboard('Coil Head')">Coil Head</div>
+                <div class="terminal-btn" onclick="openSoundboard('Bracken')">Bracken</div>
+                <div class="terminal-btn" onclick="openSoundboard('Nutcracker')">Nutcracker</div>
+                <div class="terminal-btn" onclick="openSoundboard('Thumper')">Thumper</div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-green-400 mb-2 border-l-4 border-green-400 pl-2 text-sm uppercase">Outdoor Threats</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div class="terminal-btn" onclick="openSoundboard('Eyeless Dog')">Eyeless Dog</div>
+                <div class="terminal-btn" onclick="openSoundboard('Forest Keeper')">Forest Keeper</div>
+                <div class="terminal-btn" onclick="openSoundboard('Earth Leviathan')">Earth Leviathan</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="soundboard-view" class="hidden flex-grow flex flex-col">
+        <div class="flex justify-between items-center mb-6">
+            <h2 id="active-entity-name" class="text-3xl text-white">ENTITY</h2>
+            <div class="flex gap-2">
+                <button onclick="stopAllSounds()" class="text-xs border border-red-500 px-2 py-1 text-red-500 uppercase font-bold">[ Abort ]</button>
+                <button onclick="backToSelection()" class="text-xs border border-white px-2 py-1 text-white uppercase font-bold">[ Back ]</button>
+            </div>
+        </div>
+        <div id="sound-buttons-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+    </div>
+
+    <script>
+        const ENTITY_ASSETS = {
+            'Jester': {
+                'Free Jester': './audio/jester/free_jester.mp3',
+                'Original Windup': './audio/jester/original_windup.mp3'
+            },
+            'Hoarding Bug': {
+                'Yippee!': './audio/hoarding_bug/yippee.mp3',
+                'Ambient': './audio/hoarding_bug/ambient.mp3',
+                'Aggro Squeal': './audio/hoarding_bug/aggro.mp3'
+            },
+            'Coil Head': {
+                'Scuttle': './audio/coil_head/scuttle.mp3',
+                'Spring': './audio/coil_head/spring.mp3'
+            },
+            'Bracken': {
+                'Ambient': './audio/bracken/ambient.mp3',
+                'Neck Crack': './audio/bracken/crack.mp3'
+            },
+            'Nutcracker': {
+                'Marching': './audio/nutcracker/march.mp3',
+                'Gunshot': './audio/nutcracker/bang.mp3'
+            },
+            'Thumper': {
+                'Aggressive Charge': './audio/thumper/charge.mp3'
+            },
+            'Eyeless Dog': {
+                'Sniffing': './audio/eyeless_dog/sniff.mp3',
+                'Hard Bark': './audio/eyeless_dog/hardbark.mp3'
+            },
+            'Forest Keeper': {
+                'Heavy Step': './audio/forest_keeper/step.mp3',
+                'Eating': './audio/forest_keeper/eat.mp3'
+            },
+            'Earth Leviathan': {
+                'Ground Rumble': './audio/earth_leviathan/rumble.mp3'
+            }
+        };
+
+        let activeAudio = [];
+
+        function openSoundboard(entityName) {
+            document.getElementById('selection-view').classList.add('hidden');
+            document.getElementById('soundboard-view').classList.remove('hidden');
+            document.getElementById('active-entity-name').innerText = entityName;
+            const container = document.getElementById('sound-buttons-container');
+            container.innerHTML = '';
+            const soundMap = ENTITY_ASSETS[entityName] || {};
+            Object.keys(soundMap).forEach(soundLabel => {
+                const url = soundMap[soundLabel];
+                const btn = document.createElement('button');
+                btn.className = 'sound-btn';
+                const labelText = document.createElement('span');
+                labelText.innerText = soundLabel;
+                btn.appendChild(labelText);
+                const progress = document.createElement('div');
+                progress.className = 'progress-bar';
+                btn.appendChild(progress);
+                btn.onclick = () => playSound(entityName, soundLabel, url, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function backToSelection() {
+            stopAllSounds();
+            document.getElementById('selection-view').classList.remove('hidden');
+            document.getElementById('soundboard-view').classList.add('hidden');
+        }
+
+        function playSound(entity, label, url, btn) {
+            const existing = activeAudio.find(a => a.label === label && a.entity === entity);
+            if (existing) { existing.audio.pause(); existing.audio.currentTime = 0; }
+            try {
+                const audio = new Audio(url);
+                const progress = btn.querySelector('.progress-bar');
+                const audioObj = { audio, label, entity, btn };
+                activeAudio.push(audioObj);
+                btn.classList.add('playing');
+                audio.play();
+                audio.ontimeupdate = () => {
+                    if (audio.duration) {
+                        const pct = (audio.currentTime / audio.duration) * 100;
+                        progress.style.width = `${pct}%`;
+                    }
+                };
+                audio.onended = () => {
+                    btn.classList.remove('playing');
+                    progress.style.width = '0%';
+                    activeAudio = activeAudio.filter(a => a !== audioObj);
+                };
+                audio.onerror = () => {
+                    btn.classList.remove('playing');
+                    console.error("Missing file: " + url);
+                };
+            } catch (e) { console.error(e); }
+        }
+
+        function stopAllSounds() {
+            activeAudio.forEach(item => {
+                item.audio.pause();
+                item.audio.currentTime = 0;
+                item.btn.classList.remove('playing');
+                item.btn.querySelector('.progress-bar').style.width = '0%';
+            });
+            activeAudio = [];
+        }
+    </script>
+</body>
+</html>
