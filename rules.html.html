@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lethal Outdoors: Contract Protocol</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load a Monospace/Terminal-style font -->
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0c;
+            --text-neon: #B5FF64;
+            --text-amber: #FFA500;
+            --text-error: #FF3333;
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-neon);
+            font-family: 'Roboto Mono', monospace;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        h1, h2, h3 {
+            font-family: 'VT323', monospace;
+            text-transform: uppercase;
+            color: var(--text-amber);
+        }
+        .terminal-header {
+            border-bottom: 2px solid var(--text-neon);
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+        }
+        .terminal-block {
+            border: 1px solid var(--text-neon);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(181, 255, 100, 0.1);
+            background: rgba(181, 255, 100, 0.02);
+        }
+        .flicker {
+            animation: flicker 2s infinite alternate;
+        }
+        @keyframes flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.85; }
+            100% { opacity: 1; }
+        }
+        .threat-card {
+            transition: transform 0.2s ease;
+        }
+        .threat-card:hover {
+            transform: scale(1.01);
+            background: rgba(255, 165, 0, 0.05);
+        }
+        .mobile-table th, .mobile-table td {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.5rem 0;
+        }
+        @media (min-width: 768px) {
+            .mobile-table th, .mobile-table td {
+                display: table-cell;
+                width: auto;
+                padding: 0.75rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- HEADER -->
+        <header class="terminal-header mb-8">
+            <h1 class="text-5xl flicker">
+                // LETHAL OUTDOORS CONTRACT: REV 2.1 //
+            </h1>
+            <nav class="mt-4 flex flex-wrap gap-4 text-sm md:text-base border-t border-dashed border-[var(--text-neon)] pt-4">
+                <a href="#protocol" class="text-white hover:text-yellow-400">[ MISSION PROTOCOL ]</a>
+                <a href="#threats" class="text-white hover:text-yellow-400">[ THREAT ANALYSIS ]</a>
+                <a href="#equipment" class="text-white hover:text-yellow-400">[ GEAR SPECS ]</a>
+                <a href="#gm-toolkit" class="text-white hover:text-yellow-400">[ GM OPS ]</a>
+            </nav>
+        </header>
+
+        <!-- MISSION PROTOCOL -->
+        <section id="protocol" class="mb-12">
+            <h2 class="text-3xl terminal-header">MISSION PROTOCOL: THE HARVEST</h2>
+            <div class="terminal-block mb-6">
+                <p class="text-xl font-bold text-[var(--text-amber)]">OBJECTIVE</p>
+                <p class="mt-2">Recover high-value **SCRAP** from the facility grounds. All items must be physically returned to the **SHIP** (Designated GM Area). Total scrap value must meet or exceed the **PROFIT QUOTA** by the end of the shift.</p>
+                <p class="mt-4"><strong>TERMINATION POLICY:</strong> Any contact from an Entity results in immediate elimination. Eliminated employees must drop all scrap and return to the Ship silently.</p>
+            </div>
+        </section>
+
+        <!-- THREAT ANALYSIS -->
+        <section id="threats" class="mb-12">
+            <h2 class="text-3xl terminal-header">THREAT ANALYSIS: ENTITY BEHAVIORS</h2>
+            <p class="mb-6 opacity-80">Entities are players or GMs following strict movement protocols. Safety and fair play are mandatory.</p>
+
+            <div class="grid grid-cols-1 gap-6">
+                
+                <!-- INDOOR THREATS -->
+                <div class="border-l-4 border-blue-500 pl-4 mb-4">
+                    <h3 class="text-xl text-blue-400 uppercase tracking-tighter">Category: Indoor Inhabitants</h3>
+                </div>
+
+                <!-- Hoarding Bug -->
+                <div class="terminal-block threat-card bg-opacity-10 bg-blue-900 border-blue-500">
+                    <h3 class="text-2xl text-[var(--text-amber)]">HOARDING BUG (The Collector)</h3>
+                    <p class="text-blue-300 mt-1 italic">"Yippee! Don't touch my pile."</p>
+                    <p class="mt-2"><strong>LARP RULE:</strong> The Hoarding Bug starts as neutral. They designate a small area as their **"Nest."** They wander the facility picking up any unheld scrap and bringing it to the nest.</p>
+                    <p class="mt-2"><strong>AGGRESSION:</strong> If a player enters the nest or attempts to take scrap from it, the Bug emits a high-pitched yell and enters an aggressive state, allowed to sprint and tag players. If players drop the scrap and flee the nest, the Bug returns to neutral after 10 seconds.</p>
+                </div>
+
+                <!-- Jester -->
+                <div class="terminal-block threat-card bg-opacity-10 bg-red-900">
+                    <h3 class="text-2xl text-[var(--text-amber)]">JESTER (Lullaby Stalker)</h3>
+                    <p class="text-red-400 mt-1 italic">"If you hear the music, you are already too deep."</p>
+                    <p class="mt-2"><strong>LARP RULE:</strong> The Jester plays a loud Lullaby SFX. While the music plays, the Jester is passive. Once the music **STOPS** (or speeds up), the Jester enters a frenzy and can sprint to tag any player.</p>
+                </div>
+
+                <!-- Coil-Head -->
+                <div class="terminal-block threat-card">
+                    <h3 class="text-2xl text-[var(--text-amber)]">COIL-HEAD (The Weeping Sentry)</h3>
+                    <p class="mt-2"><strong>MOVEMENT:</strong> The Coil-Head **must freeze** if any employee is looking at them. They may only move when completely unobserved. </p>
+                    <p class="text-[var(--text-error)] mt-1 font-bold">WARNING: Do not blink. They move faster than the eye can follow.</p>
+                </div>
+
+                <!-- Bunker Spider -->
+                <div class="terminal-block threat-card">
+                    <h3 class="text-2xl text-[var(--text-amber)]">BUNKER SPIDER (Web Weaver)</h3>
+                    <p class="mt-2"><strong>LARP RULE:</strong> The Spider uses caution tape or string to create "webs" across corridors. If an employee touches or breaks a web, the Spider is alerted and may sprint to tag for 5 seconds.</p>
+                </div>
+
+                <!-- Snare Flea -->
+                <div class="terminal-block threat-card">
+                    <h3 class="text-2xl text-[var(--text-amber)]">SNARE FLEA (Ceiling Ambusher)</h3>
+                    <p class="mt-2"><strong>LARP RULE:</strong> Hangs a plush toy or tag from a doorway. If a player walks through it, the Entity (hiding nearby) jumps out. The player is "stunned" and cannot move for 10 seconds while the Flea tags them.</p>
+                </div>
+
+                <!-- Nutcracker -->
+                <div class="terminal-block threat-card">
+                    <h3 class="text-2xl text-[var(--text-amber)]">NUTCRACKER (The Sentry)</h3>
+                    <p class="mt-2"><strong>LARP RULE:</strong> Marches in a mechanical rhythm. Every 15 seconds, the Nutcracker stops and "scans" by turning 360 degrees. If they see movement during the scan, they point their "Shotgun" (a prop) and yell "BANG!" to eliminate.</p>
+                </div>
+
+                <!-- OUTDOOR THREATS -->
+                <div class="border-l-4 border-green-500 pl-4 mt-8 mb-4">
+                    <h3 class="text-xl text-green-400 uppercase tracking-tighter">Category: Nocturnal/Outdoor</h3>
+                </div>
+
+                <!-- Eyeless Dog -->
+                <div class="terminal-block threat-card bg-opacity-10 bg-yellow-900">
+                    <h3 class="text-2xl text-[var(--text-amber)]">EYELESS DOG (Sound Hunter)</h3>
+                    <p class="mt-2"><strong>LARP RULE:</strong> The player acting as the Dog **must be blindfolded**. They may only move towards sources of sound (talking, running, clanking scrap). If they tag an employee, it is a 1-hit kill.</p>
+                </div>
+
+                <!-- Forest Keeper -->
+                <div class="terminal-block threat-card bg-opacity-10 bg-green-900">
+                    <h3 class="text-2xl text-[var(--text-amber)]">FOREST KEEPER (The Behemoth)</h3>
+                    <p class="mt-2"><strong>LARP RULE:</strong> Must be highly visible (tallest player or wearing a reflective vest). Moves only if employees are in direct Line-of-Sight. If a Keeper tags a player, that player is "captured" and must walk with the Keeper to a "Nest" area (elimination zone).</p>
+                </div>
+
+                <!-- Earth Leviathan -->
+                <div class="terminal-block threat-card bg-opacity-10 bg-red-900">
+                    <h3 class="text-2xl text-[var(--text-error)]">EARTH LEVIATHAN (Subterranean Worm)</h3>
+                    <p class="mt-2"><strong>LARP RULE:</strong> Triggered by the GM. When the GM plays a "Low Rumble" audio track, all employees have 3 seconds to clear a 10-foot radius from the rumble source. The "Worm" (an Entity player) jumps up from a hidden spot. Anyone still in the zone is eliminated.</p>
+                </div>
+
+                <!-- Baboon Hawk -->
+                <div class="terminal-block threat-card">
+                    <h3 class="text-2xl text-[var(--text-amber)]">BABOON HAWK (Pack Predator)</h3>
+                    <p class="mt-2"><strong>LARP RULE:</strong> Only aggressive if they outnumber the players in the area (e.g., 2 Hawks vs 1 Player). Otherwise, they must stay 10 feet away, circling and making noise. If the Hawks outnumber the group, they can rush to tag.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- EQUIPMENT SPECS -->
+        <section id="equipment" class="mb-12">
+            <h2 class="text-3xl terminal-header">EQUIPMENT SPECS: EMPLOYEE GEAR</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="terminal-block">
+                    <h3 class="text-lg text-[var(--text-amber)]">Flashlight (Basic)</h3>
+                    <p class="text-sm mt-1">Essential for seeing Bracken or Coil-Heads. Battery lasts 10 minutes of continuous use.</p>
+                </div>
+                <div class="terminal-block">
+                    <h3 class="text-lg text-[var(--text-amber)]">Walkie-Talkie</h3>
+                    <p class="text-sm mt-1">Direct link to the Ship. **WARNING:** Using these attracts Eyeless Dogs and Thumpers.</p>
+                </div>
+                <div class="terminal-block">
+                    <h3 class="text-lg text-[var(--text-amber)]">Boombox</h3>
+                    <p class="text-sm mt-1">Used to distract Baboon Hawks or draw Eyeless Dogs away from the group.</p>
+                </div>
+                <div class="terminal-block">
+                    <h3 class="text-lg text-[var(--text-amber)]">Stun Grenade</h3>
+                    <p class="text-sm mt-1">One-time use. Flashlight strobe or physical toss. Freezes all Entities in a 5ft radius for 10 seconds.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- GM OPERATIONS -->
+        <section id="gm-toolkit" class="mb-12">
+            <h2 class="text-3xl terminal-header">GM OPERATIONS: THE COMPANY HEAD</h2>
+            <div class="terminal-block">
+                <ul class="list-disc ml-6 space-y-2">
+                    <li><strong>Audio Atmosphere:</strong> Use a central speaker to play ambient factory/wind noises.</li>
+                    <li><strong>Difficulty Spikes:</strong> At 30 minutes, announce "Power Surge" and deploy the Jester or Nutcracker.</li>
+                    <li><strong>The Deadline:</strong> At 5 minutes left, play a loud alarm. All players must return to the ship or be "left behind" (Termination).</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="text-center mt-12 text-gray-500 text-xs border-t border-gray-800 pt-8">
+            <p>// CONTRACT DATA VERIFIED // NO GUARANTEE OF SURVIVAL //</p>
+            <p class="mt-2">LETHAL OUTDOORS &copy; THE COMPANY 2511</p>
+        </footer>
+
+    </div>
+</body>
+</html>
