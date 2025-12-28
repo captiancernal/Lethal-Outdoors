@@ -23,6 +23,9 @@
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         h1, h2, h3 {
             font-family: 'VT323', monospace;
@@ -56,33 +59,46 @@
             transform: scale(1.01);
             background: rgba(255, 165, 0, 0.05);
         }
-        .mobile-table th, .mobile-table td {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 0.5rem 0;
+        
+        /* Navigation Button Styles */
+        .nav-link-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border: 2px solid;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            border-radius: 4px;
         }
-        @media (min-width: 768px) {
-            .mobile-table th, .mobile-table td {
-                display: table-cell;
-                width: auto;
-                padding: 0.75rem 1rem;
-            }
+        
+        .nav-link-btn .sub {
+            font-size: 0.7rem;
+            font-family: 'Roboto Mono', monospace;
+            opacity: 0.7;
+            margin-top: 4px;
+            font-weight: normal;
         }
     </style>
 </head>
 <body class="p-4 md:p-8">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-4xl mx-auto flex-grow">
         <!-- HEADER -->
         <header class="terminal-header mb-8">
             <h1 class="text-5xl flicker">
                 // LETHAL OUTDOORS CONTRACT: REV 2.1 //
             </h1>
             <nav class="mt-4 flex flex-wrap gap-4 text-sm md:text-base border-t border-dashed border-[var(--text-neon)] pt-4">
-                <a href="#protocol" class="text-white hover:text-yellow-400">[ MISSION PROTOCOL ]</a>
-                <a href="#threats" class="text-white hover:text-yellow-400">[ THREAT ANALYSIS ]</a>
-                <a href="#equipment" class="text-white hover:text-yellow-400">[ GEAR SPECS ]</a>
-                <a href="#gm-toolkit" class="text-white hover:text-yellow-400">[ GM OPS ]</a>
+                <a href="#protocol" class="text-white hover:text-yellow-400 uppercase">[ Protocol ]</a>
+                <a href="#threats" class="text-white hover:text-yellow-400 uppercase">[ Threats ]</a>
+                <a href="#equipment" class="text-white hover:text-yellow-400 uppercase">[ Gear ]</a>
+                <a href="#gm-toolkit" class="text-white hover:text-yellow-400 uppercase">[ GM Ops ]</a>
             </nav>
         </header>
 
@@ -214,13 +230,23 @@
                 </ul>
             </div>
         </section>
-
-        <!-- FOOTER -->
-        <footer class="text-center mt-12 text-gray-500 text-xs border-t border-gray-800 pt-8">
-            <p>// CONTRACT DATA VERIFIED // NO GUARANTEE OF SURVIVAL //</p>
-            <p class="mt-2">LETHAL OUTDOORS &copy; THE COMPANY 2511</p>
-        </footer>
-
     </div>
+
+    <!-- PERSISTENT QUICK-SWITCH NAV -->
+    <footer class="mt-12 pt-8 border-t border-gray-800 pb-8 px-4 max-w-4xl mx-auto w-full">
+        <h3 class="text-white mb-4 text-center opacity-50 text-xs uppercase tracking-widest">Field Module Switcher</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <a href="index.html" class="nav-link-btn border-[var(--text-neon)] text-[var(--text-neon)] hover:bg-[var(--text-neon)] hover:text-black">
+                <span>[ AUDIO SOUNDBOARD ]</span>
+                <span class="sub">Trigger Entity SFX & Atmosphere</span>
+            </a>
+            <a href="terminal.html" class="nav-link-btn border-[var(--text-amber)] text-[var(--text-amber)] hover:bg-[var(--text-amber)] hover:text-black">
+                <span>[ GM TERMINAL ]</span>
+                <span class="sub">Check Scrap Quota & Moon Routing</span>
+            </a>
+        </div>
+        <p class="text-center text-[0.5rem] opacity-30 mt-6 uppercase tracking-tighter">Authorized Company Access Only // Protocol v2.1</p>
+    </footer>
+
 </body>
 </html>
