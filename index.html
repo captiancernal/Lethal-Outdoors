@@ -74,6 +74,12 @@
             color: var(--text-neon);
         }
 
+        .sound-btn.error {
+            border-color: var(--text-error);
+            color: var(--text-error);
+            background: rgba(255, 51, 51, 0.1);
+        }
+
         .progress-bar {
             position: absolute;
             bottom: 0; left: 0; height: 4px;
@@ -154,8 +160,8 @@
 
     <header class="border-b border-[var(--text-neon)] pb-4 mb-6 flex justify-between items-start">
         <div>
-            <h1 class="text-4xl text-[var(--text-amber)] flicker">// FIELD_LINK_V3.0 //</h1>
-            <p class="text-[0.6rem] opacity-50 uppercase tracking-widest">Field Audio Encryption: Active</p>
+            <h1 class="text-4xl text-[var(--text-amber)] flicker">// FIELD_LINK_V3.1 //</h1>
+            <p class="text-[0.6rem] opacity-50 uppercase tracking-widest">Status: Ready for Deployment</p>
         </div>
         <button onclick="openSync()" class="text-[0.6rem] border border-[var(--text-amber)] px-2 py-1 text-[var(--text-amber)] hover:bg-[var(--text-amber)] hover:text-black transition uppercase font-bold">
             [ Troubleshoot Audio ]
@@ -217,7 +223,27 @@
     </footer>
 
     <script>
-        // MASTER ASSET MAP - Standardized paths for GitHub Folder Structure
+        /**
+         * GITHUB DEPLOYMENT MAP (Case-Sensitive!)
+         * -------------------------------------
+         * /audio/jester/free_jester.mp3
+         * /audio/jester/original_windup.mp3
+         * /audio/hoarding_bug/yippee.mp3
+         * /audio/hoarding_bug/ambient.mp3
+         * /audio/hoarding_bug/aggro.mp3
+         * /audio/coil_head/scuttle.mp3
+         * /audio/coil_head/spring.mp3
+         * /audio/bracken/ambient.mp3
+         * /audio/bracken/crack.mp3
+         * /audio/nutcracker/march.mp3
+         * /audio/nutcracker/bang.mp3
+         * /audio/thumper/charge.mp3
+         * /audio/eyeless_dog/sniff.mp3
+         * /audio/eyeless_dog/hardbark.mp3
+         * /audio/forest_keeper/step.mp3
+         * /audio/forest_keeper/eat.mp3
+         * /audio/earth_leviathan/rumble.mp3
+         */
         const ENTITY_ASSETS = {
             'Jester': {
                 'Free Jester': './audio/jester/free_jester.mp3',
@@ -229,7 +255,7 @@
                 'Aggro Squeal': './audio/hoarding_bug/aggro.mp3'
             },
             'Coil Head': {
-                'Scuttle': './audio/coil_head/scuttle.mp3',
+                'Fast Scuttle': './audio/coil_head/scuttle.mp3',
                 'Spring Bounce': './audio/coil_head/spring.mp3'
             },
             'Bracken': {
@@ -273,8 +299,8 @@
                 div.className = `sync-item ${memoryVault[p] ? 'synced' : ''}`;
                 div.innerHTML = `
                     <span class="font-mono text-[0.6rem]">${fileName}</span>
-                    <input type="file" accept="audio/*" class="hidden" id="sync-${fileName}" onchange="handleManualSync(event, '${p}')">
-                    <label for="sync-${fileName}" class="cursor-pointer border border-[#555] px-2 py-0.5 hover:bg-white hover:text-black uppercase text-[0.5rem] font-bold">
+                    <input type="file" accept="audio/*" class="hidden" id="sync-${fileName.replace(/\./g, '-')}" onchange="handleManualSync(event, '${p}')">
+                    <label for="sync-${fileName.replace(/\./g, '-')}" class="cursor-pointer border border-[#555] px-2 py-0.5 hover:bg-white hover:text-black uppercase text-[0.5rem] font-bold">
                         ${memoryVault[p] ? '[ Synced ]' : '[ Link File ]'}
                     </label>
                 `;
@@ -294,7 +320,6 @@
             const parent = event.target.parentElement;
             parent.classList.add('synced');
             parent.querySelector('label').innerText = '[ Synced ]';
-            console.log(`Synced memory mapping: ${path}`);
         }
 
         let activeAudio = [];
@@ -329,11 +354,11 @@
         }
 
         function playSound(entity, label, path, btn) {
+            btn.classList.remove('error');
             const existing = activeAudio.find(a => a.label === label && a.entity === entity);
             if (existing) { existing.audio.pause(); existing.audio.currentTime = 0; }
             
             try {
-                // Determine final source: memory synced URL or the GitHub path fallback
                 const finalUrl = memoryVault[path] || path;
                 const audio = new Audio(finalUrl);
                 const progress = btn.querySelector('.progress-bar');
@@ -343,7 +368,7 @@
                 btn.classList.add('playing');
                 
                 audio.play().catch(e => {
-                    console.warn("Autoplay blocked. User intervention required (Troubleshoot tool recommended).");
+                    console.warn("Playback blocked. Use Troubleshoot tool in Canvas.");
                 });
 
                 audio.ontimeupdate = () => {
@@ -361,7 +386,14 @@
 
                 audio.onerror = () => {
                     btn.classList.remove('playing');
-                    console.error("Audio trigger failed for: " + path);
+                    btn.classList.add('error');
+                    const originalText = btn.firstChild.innerText;
+                    btn.firstChild.innerText = "ERROR: FILE NOT FOUND";
+                    console.error("Path failed: " + path);
+                    setTimeout(() => {
+                        btn.classList.remove('error');
+                        btn.firstChild.innerText = originalText;
+                    }, 3000);
                 };
             } catch (e) { console.error(e); }
         }
