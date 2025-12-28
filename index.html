@@ -111,24 +111,63 @@
             opacity: 0.7;
             margin-top: 4px;
         }
+
+        .sync-panel {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: #111;
+            border: 2px solid var(--text-amber);
+            padding: 2rem;
+            z-index: 1001;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9);
+        }
+
+        .sync-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #333;
+            font-size: 0.7rem;
+        }
+
+        .sync-item.synced { color: var(--text-neon); }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <header class="border-b border-[var(--text-neon)] pb-4 mb-6">
-        <h1 class="text-4xl text-[var(--text-amber)] flicker">// AUDIO_COMMAND_CENTER_V2.6 //</h1>
-        <div class="flex gap-4 mt-2">
-            <a href="rules.html" class="text-[0.7rem] text-white hover:text-[var(--text-neon)] underline font-bold uppercase">[ Rules ]</a>
-            <a href="terminal.html" class="text-[0.7rem] text-white hover:text-[var(--text-neon)] underline font-bold uppercase">[ Terminal ]</a>
+    <!-- ASSET SYNC OVERLAY -->
+    <div id="sync-overlay" class="sync-panel hidden">
+        <h2 class="text-2xl text-[var(--text-amber)] mb-2 font-mono uppercase tracking-widest">Asset_Sync_Protocol</h2>
+        <p class="text-xs mb-6 opacity-70">Browser security restricts local folder access in preview mode. Select your MP3 files below to link them for the current session.</p>
+        
+        <div id="sync-list" class="space-y-1">
+            <!-- Populated by JS -->
         </div>
+
+        <button onclick="closeSync()" class="mt-8 w-full bg-[var(--text-neon)] text-black px-4 py-2 font-bold uppercase hover:bg-white transition">[ Initialize Comms ]</button>
+    </div>
+
+    <header class="border-b border-[var(--text-neon)] pb-4 mb-6 flex justify-between items-start">
+        <div>
+            <h1 class="text-4xl text-[var(--text-amber)] flicker">// FIELD_LINK_V3.0 //</h1>
+            <p class="text-[0.6rem] opacity-50 uppercase tracking-widest">Field Audio Encryption: Active</p>
+        </div>
+        <button onclick="openSync()" class="text-[0.6rem] border border-[var(--text-amber)] px-2 py-1 text-[var(--text-amber)] hover:bg-[var(--text-amber)] hover:text-black transition uppercase font-bold">
+            [ Troubleshoot Audio ]
+        </button>
     </header>
 
     <main class="flex-grow">
         <div id="selection-view">
-            <h2 class="text-2xl mb-4 text-white text-center">SELECT ENTITY FREQUENCY:</h2>
+            <h2 class="text-2xl mb-4 text-white text-center tracking-widest">ENTITY_FREQUENCY_CONTROL</h2>
             
             <div class="mb-8">
-                <h3 class="text-blue-400 mb-2 border-l-4 border-blue-400 pl-2 text-sm uppercase">Indoor Inhabitants</h3>
+                <h3 class="text-blue-400 mb-2 border-l-4 border-blue-400 pl-2 text-sm uppercase">Indoor Habitants</h3>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <div class="terminal-btn" onclick="openSoundboard('Jester')">Jester</div>
                     <div class="terminal-btn" onclick="openSoundboard('Hoarding Bug')">Hoarding Bug</div>
@@ -151,7 +190,7 @@
 
         <div id="soundboard-view" class="hidden flex-grow flex flex-col">
             <div class="flex justify-between items-center mb-6">
-                <h2 id="active-entity-name" class="text-3xl text-white">ENTITY</h2>
+                <h2 id="active-entity-name" class="text-3xl text-white tracking-tighter uppercase font-bold">ENTITY</h2>
                 <div class="flex gap-2">
                     <button onclick="stopAllSounds()" class="text-xs border border-red-500 px-2 py-1 text-red-500 uppercase font-bold">[ Abort ]</button>
                     <button onclick="backToSelection()" class="text-xs border border-white px-2 py-1 text-white uppercase font-bold">[ Back ]</button>
@@ -161,23 +200,24 @@
         </div>
     </main>
 
-    <!-- PERSISTENT QUICK-SWITCH NAV -->
+    <!-- PERSISTENT NAVIGATION -->
     <footer class="mt-12 pt-8 border-t border-gray-800 pb-8">
-        <h3 class="text-white mb-4 text-center opacity-50 text-xs uppercase tracking-widest">Field Module Switcher</h3>
+        <h3 class="text-white mb-4 text-center opacity-50 text-xs uppercase tracking-widest font-mono">Module Switching Array</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <a href="terminal.html" class="nav-link-btn border-[var(--text-amber)] text-[var(--text-amber)] hover:bg-[var(--text-amber)] hover:text-black">
                 <span>[ GM TERMINAL ]</span>
-                <span class="sub">Check Scrap Quota & Moon Routing</span>
+                <span class="sub">Log Scrap & Check Quota</span>
             </a>
             <a href="rules.html" class="nav-link-btn border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-black">
                 <span>[ CONTRACT RULES ]</span>
-                <span class="sub">Review Entity Protocols & Gear</span>
+                <span class="sub">Review Entity Protocols</span>
             </a>
         </div>
-        <p class="text-center text-[0.5rem] opacity-30 mt-6 uppercase tracking-tighter">Authorized Company Access Only // Field Link V2.6</p>
+        <p class="text-center text-[0.5rem] opacity-30 mt-6 uppercase tracking-[0.3em] font-mono">AUTHORIZED COMPANY ACCESS ONLY // LETHAL OUTDOORS OS</p>
     </footer>
 
     <script>
+        // MASTER ASSET MAP - Standardized paths for GitHub Folder Structure
         const ENTITY_ASSETS = {
             'Jester': {
                 'Free Jester': './audio/jester/free_jester.mp3',
@@ -185,23 +225,23 @@
             },
             'Hoarding Bug': {
                 'Yippee!': './audio/hoarding_bug/yippee.mp3',
-                'Ambient': './audio/hoarding_bug/ambient.mp3',
+                'Ambient Chitter': './audio/hoarding_bug/ambient.mp3',
                 'Aggro Squeal': './audio/hoarding_bug/aggro.mp3'
             },
             'Coil Head': {
                 'Scuttle': './audio/coil_head/scuttle.mp3',
-                'Spring': './audio/coil_head/spring.mp3'
+                'Spring Bounce': './audio/coil_head/spring.mp3'
             },
             'Bracken': {
-                'Ambient': './audio/bracken/ambient.mp3',
+                'Stalking Ambient': './audio/bracken/ambient.mp3',
                 'Neck Crack': './audio/bracken/crack.mp3'
             },
             'Nutcracker': {
-                'Marching': './audio/nutcracker/march.mp3',
-                'Gunshot': './audio/nutcracker/bang.mp3'
+                'Searching': './audio/nutcracker/march.mp3',
+                'Marching Attack': './audio/nutcracker/bang.mp3'
             },
             'Thumper': {
-                'Aggressive Charge': './audio/thumper/charge.mp3'
+                'Charge Roar': './audio/thumper/charge.mp3'
             },
             'Eyeless Dog': {
                 'Sniffing': './audio/eyeless_dog/sniff.mp3',
@@ -209,12 +249,53 @@
             },
             'Forest Keeper': {
                 'Heavy Step': './audio/forest_keeper/step.mp3',
-                'Eating': './audio/forest_keeper/eat.mp3'
+                'Eating Player': './audio/forest_keeper/eat.mp3'
             },
             'Earth Leviathan': {
                 'Ground Rumble': './audio/earth_leviathan/rumble.mp3'
             }
         };
+
+        const memoryVault = {};
+
+        function openSync() {
+            const list = document.getElementById('sync-list');
+            list.innerHTML = '';
+            
+            const paths = new Set();
+            Object.values(ENTITY_ASSETS).forEach(entity => {
+                Object.values(entity).forEach(p => paths.add(p));
+            });
+
+            paths.forEach(p => {
+                const fileName = p.split('/').pop();
+                const div = document.createElement('div');
+                div.className = `sync-item ${memoryVault[p] ? 'synced' : ''}`;
+                div.innerHTML = `
+                    <span class="font-mono text-[0.6rem]">${fileName}</span>
+                    <input type="file" accept="audio/*" class="hidden" id="sync-${fileName}" onchange="handleManualSync(event, '${p}')">
+                    <label for="sync-${fileName}" class="cursor-pointer border border-[#555] px-2 py-0.5 hover:bg-white hover:text-black uppercase text-[0.5rem] font-bold">
+                        ${memoryVault[p] ? '[ Synced ]' : '[ Link File ]'}
+                    </label>
+                `;
+                list.appendChild(div);
+            });
+
+            document.getElementById('sync-overlay').classList.remove('hidden');
+        }
+
+        function closeSync() { document.getElementById('sync-overlay').classList.add('hidden'); }
+
+        function handleManualSync(event, path) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const url = URL.createObjectURL(file);
+            memoryVault[path] = url;
+            const parent = event.target.parentElement;
+            parent.classList.add('synced');
+            parent.querySelector('label').innerText = '[ Synced ]';
+            console.log(`Synced memory mapping: ${path}`);
+        }
 
         let activeAudio = [];
 
@@ -247,30 +328,40 @@
             document.getElementById('soundboard-view').classList.add('hidden');
         }
 
-        function playSound(entity, label, url, btn) {
+        function playSound(entity, label, path, btn) {
             const existing = activeAudio.find(a => a.label === label && a.entity === entity);
             if (existing) { existing.audio.pause(); existing.audio.currentTime = 0; }
+            
             try {
-                const audio = new Audio(url);
+                // Determine final source: memory synced URL or the GitHub path fallback
+                const finalUrl = memoryVault[path] || path;
+                const audio = new Audio(finalUrl);
                 const progress = btn.querySelector('.progress-bar');
                 const audioObj = { audio, label, entity, btn };
+                
                 activeAudio.push(audioObj);
                 btn.classList.add('playing');
-                audio.play();
+                
+                audio.play().catch(e => {
+                    console.warn("Autoplay blocked. User intervention required (Troubleshoot tool recommended).");
+                });
+
                 audio.ontimeupdate = () => {
                     if (audio.duration) {
                         const pct = (audio.currentTime / audio.duration) * 100;
                         progress.style.width = `${pct}%`;
                     }
                 };
+
                 audio.onended = () => {
                     btn.classList.remove('playing');
                     progress.style.width = '0%';
                     activeAudio = activeAudio.filter(a => a !== audioObj);
                 };
+
                 audio.onerror = () => {
                     btn.classList.remove('playing');
-                    console.error("Missing file: " + url);
+                    console.error("Audio trigger failed for: " + path);
                 };
             } catch (e) { console.error(e); }
         }
@@ -286,4 +377,4 @@
         }
     </script>
 </body>
-</html>s
+</html>
