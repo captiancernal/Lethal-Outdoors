@@ -49,15 +49,6 @@
         .flicker { animation: flicker 0.15s infinite; }
         @keyframes flicker { 0% { opacity: 0.97; } 100% { opacity: 1; } }
 
-        .emergency-flicker {
-            animation: red-alert 0.5s infinite;
-        }
-        @keyframes red-alert {
-            0% { background-color: rgba(255, 0, 0, 0.2); }
-            50% { background-color: rgba(100, 0, 0, 0.5); }
-            100% { background-color: rgba(255, 0, 0, 0.2); }
-        }
-
         .cursor {
             display: inline-block;
             width: 10px;
@@ -101,25 +92,26 @@
 
         .amber { color: var(--text-amber); }
         .red { color: var(--text-error); }
-        .moon-info { color: #88ccff; }
     </style>
 </head>
 <body>
 
     <!-- LANDING VIEW -->
-    <div id="landing-view" class="p-4 md:p-8 max-w-4xl mx-auto overflow-y-auto h-full">
+    <div id="landing-view" class="p-4 md:p-8 max-w-4xl mx-auto overflow-y-auto h-full flex flex-col justify-center">
         <header class="border-b-2 border-[#B5FF64] pb-4 mb-8">
             <h1 class="text-5xl text-[#FFA500] flicker uppercase tracking-widest">
                 // LETHAL OUTDOORS: CONTRACT REV 4.2 //
             </h1>
         </header>
 
-        <div class="bg-gray-900 border border-[#B5FF64] p-6 rounded-lg mb-8">
-            <h2 class="text-3xl text-red-500 mb-4">CRITICAL ALERT: QUOTA NOT MET</h2>
-            <p class="text-xl">The Company requires results. You have 3 days to gather scrap. On the 4th day, you must deliver your inventory to Gordion (The Company Building). Failure is not an option.</p>
-            <button onclick="initGame()" class="mt-6 bg-[#B5FF64] text-black font-bold py-3 px-10 text-2xl hover:bg-white transition uppercase rounded">
-                [ INITIALIZE TERMINAL ]
-            </button>
+        <div class="bg-gray-900 border border-[#B5FF64] p-8 rounded-lg mb-8">
+            <h2 class="text-3xl text-red-500 mb-4">CRITICAL ALERT: OFFLINE</h2>
+            <p class="text-xl leading-relaxed">The Company requires terminal interaction for scrap logging and moon routing. Manual navigation buttons have been disabled to ensure protocol compliance.</p>
+            <div class="mt-8">
+                <button onclick="initGame()" class="bg-[#B5FF64] text-black font-bold py-4 px-12 text-3xl hover:bg-white transition uppercase rounded shadow-lg shadow-green-900/50">
+                    [ INITIALIZE CONSOLE ]
+                </button>
+            </div>
         </div>
     </div>
 
@@ -141,123 +133,33 @@
     </div>
 
     <!-- GAME OVER VIEW -->
-    <div id="game-over-view" class="terminal-container hidden emergency-flicker flex flex-col items-center justify-center text-center p-10">
+    <div id="game-over-view" class="terminal-container hidden flex flex-col items-center justify-center text-center p-10">
         <h1 class="text-8xl text-red-600 mb-4 font-bold flicker">TERMINATED</h1>
-        <p class="text-4xl text-white mb-8">QUOTA NOT MET. DISCIPLINARY ACTION IN PROGRESS.</p>
-        
-        <div class="bg-black/60 p-8 border-4 border-red-600 rounded-lg max-w-2xl w-full text-left">
-            <h2 class="text-3xl text-[#FFA500] mb-6 border-b border-red-600 pb-2">RUN STATISTICS</h2>
-            <div class="text-2xl space-y-4 font-mono">
-                <div class="flex justify-between">
-                    <span>TOTAL DAYS SURVIVED:</span>
-                    <span id="stat-days" class="text-white">0</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>TOTAL SCRAP ACCUMULATED:</span>
-                    <span id="stat-scrap" class="text-white">$0</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>FINAL QUOTA GOAL:</span>
-                    <span id="stat-quota" class="text-white">$0</span>
-                </div>
-            </div>
-            
-            <button onclick="resetGame()" class="mt-10 w-full bg-red-600 text-white font-bold py-4 text-3xl hover:bg-white hover:text-red-600 transition uppercase">
-                [ RESTART PROTOCOL ]
-            </button>
-        </div>
+        <p class="text-4xl text-white mb-8">QUOTA NOT MET.</p>
+        <button onclick="resetGame()" class="bg-red-600 text-white font-bold py-4 px-10 text-2xl hover:bg-white hover:text-red-600 transition uppercase rounded">
+            [ RESTART PROTOCOL ]
+        </button>
     </div>
 
     <script>
         // --- DATA ---
         const MOON_DATA = {
-            "company": { hazard: "None", cost: 0, layout: "Office", size: 0, minScrap: 0, maxScrap: 0, indoorPower: 0, nightPower: 0, isSpecial: true },
-            "experimentation": { hazard: "B", cost: 0, layout: "Factory", size: 1, minScrap: 8, maxScrap: 11, indoorPower: 4, nightPower: 8 },
-            "assurance": { hazard: "D", cost: 0, layout: "Factory", size: 1, minScrap: 13, maxScrap: 15, indoorPower: 6, nightPower: 8 },
-            "vow": { hazard: "C", cost: 0, layout: "Mineshaft", size: 1.15, minScrap: 12, maxScrap: 14, indoorPower: 7, nightPower: 6 },
-            "offense": { hazard: "B", cost: 0, layout: "Mineshaft", size: 1.25, minScrap: 14, maxScrap: 17, indoorPower: 12, nightPower: 8 },
-            "march": { hazard: "B", cost: 0, layout: "Factory", size: 2, minScrap: 13, maxScrap: 16, indoorPower: 14, nightPower: 12 },
-            "rend": { hazard: "A", cost: 550, layout: "Mansion", size: 1.8, minScrap: 18, maxScrap: 25, indoorPower: 10, nightPower: 6 },
-            "dine": { hazard: "S", cost: 600, layout: "Mansion", size: 1.8, minScrap: 22, maxScrap: 26, indoorPower: 16, nightPower: 7 },
-            "titan": { hazard: "S+", cost: 700, layout: "Factory", size: 2.2, minScrap: 28, maxScrap: 31, indoorPower: 18, nightPower: 7 }
-        };
-
-        const BESTIARY_DATA = {
-            "jester": { power: 3, type: "indoor", desc: "Sentient box-like creature.", rules: "Must wind up lullaby." },
-            "coil-head": { power: 1, type: "indoor", desc: "Blood-stained mannequin.", rules: "Freezes in Line-of-Sight." },
-            "thumper": { power: 3, type: "indoor", desc: "Aggressive land predator.", rules: "Straight lines only." },
-            "bracken": { power: 3, type: "indoor", desc: "Stealthy flower-man.", rules: "Stalks from shadows." },
-            "nutcracker": { power: 1, type: "indoor", desc: "Wooden sentry with shotgun.", rules: "Scans every 15s." },
-            "bunker spider": { power: 2, type: "indoor", desc: "Territorial arachnid.", rules: "Webs across doors." },
-            "snare flea": { power: 1, type: "indoor", desc: "Ceiling parasite.", rules: "Drops from above." },
-            "hoarding bug": { power: 1, type: "indoor", desc: "Collector bug. Neutral unless nest is disturbed.", rules: "Designates a 'Nest'. Steals unheld scrap. Sprints to tag if nest entered/scrap taken." },
-            "spore lizard": { power: 1, type: "indoor", desc: "Defensive reptile.", rules: "Blinding gas spray." },
-            "eyeless dog": { power: 2, type: "outdoor", desc: "Blind predator.", rules: "Hunts by sound." },
-            "forest keeper": { power: 3, type: "outdoor", desc: "Massive wood giant.", rules: "Hunts by sight." },
-            "earth leviathan": { power: 2, type: "outdoor", desc: "Subterranean worm.", rules: "Lunges from below." },
-            "baboon hawk": { power: 0.5, type: "outdoor", desc: "Winged pack creature.", rules: "Aggressive in groups." }
+            "company": { hazard: "None", cost: 0, isSpecial: true },
+            "experimentation": { hazard: "B", cost: 0, minScrap: 8, maxScrap: 11 },
+            "assurance": { hazard: "D", cost: 0, minScrap: 13, maxScrap: 15 },
+            "vow": { hazard: "C", cost: 0, minScrap: 12, maxScrap: 14 },
+            "offense": { hazard: "B", cost: 0, minScrap: 14, maxScrap: 17 },
+            "march": { hazard: "B", cost: 0, minScrap: 13, maxScrap: 16 },
+            "rend": { hazard: "A", cost: 550, minScrap: 18, maxScrap: 25 },
+            "dine": { hazard: "S", cost: 600, minScrap: 22, maxScrap: 26 },
+            "titan": { hazard: "S+", cost: 700, minScrap: 28, maxScrap: 31 }
         };
 
         const SCRAP_DATA = {
-            // --- LOW TIER / COMMON ---
-            "7-chunk": [16, 28],
-            "bottle cap": [1, 3],
-            "bubble wrap": [1, 15],
-            "candy": [6, 36],
-            "coffee mug": [24, 68],
-            "cookie mold pan": [12, 40],
-            "dust pan": [12, 24],
-            "egg beater": [12, 44],
-            "flask": [16, 44],
-            "hairbrush": [8, 36],
-            "magnifying glass": [44, 60],
-            "metal sheet": [10, 22],
-            "plastic fish": [12, 28],
-            "pill bottle": [16, 40],
-            "red soda can": [18, 36],
-            "rubber ducky": [2, 10],
-            "tattered metal sheet": [10, 22],
-            "toothpaste": [14, 46],
-            "whoopie cushion": [6, 36],
-
-            // --- MID TIER / UNCOMMON ---
-            "air horn": [52, 72],
-            "big bolt": [20, 32],
-            "brass bell": [48, 80],
-            "chemical jug": [32, 84],
-            "clown horn": [52, 72],
-            "comedy": [28, 52],
-            "dentures": [60, 100],
-            "gift box": [12, 28],
-            "hairdryer": [60, 100],
-            "home run bat": [48, 80],
-            "laser pointer": [32, 100],
-            "magic 7 ball": [36, 72],
-            "old phone": [48, 64],
-            "old wheel": [40, 60],
-            "perfume bottle": [48, 104],
-            "pickle jar": [32, 60],
-            "remote": [20, 48],
-            "ring": [52, 84],
-            "shotgun": [20, 100],
-            "steering wheel": [15, 31],
-            "stop sign": [20, 50],
-            "tea kettle": [32, 56],
-            "teeth": [60, 100],
-            "tragedy": [28, 52],
-            "yield sign": [18, 36],
-
-            // --- HIGH TIER / RARE ---
-            "apparatus": [80, 80],
-            "beehive": [40, 150],
-            "cash register": [100, 160],
-            "fancy lamp": [60, 140],
-            "gold bar": [100, 210],
-            "golden cup": [40, 80],
-            "large axle": [36, 56],
-            "painting": [60, 124],
-            "toy robot": [56, 90],
-            "v-type engine": [20, 56]
+            "7-chunk": [16, 28], "bottle cap": [1, 3], "bubble wrap": [1, 15], "candy": [6, 36], "coffee mug": [24, 68],
+            "cookie mold pan": [12, 40], "dust pan": [12, 24], "egg beater": [12, 44], "flask": [16, 44], "hairbrush": [8, 36],
+            "magnifying glass": [44, 60], "metal sheet": [10, 22], "plastic fish": [12, 28], "pill bottle": [16, 40],
+            "red soda can": [18, 36], "rubber ducky": [2, 10], "tattered metal sheet": [10, 22], "toothpaste": [14, 46], "whoopie cushion": [6, 36]
         };
 
         // --- STATE ---
@@ -267,65 +169,35 @@
         let activeMoon = null;
         let travelPending = null;
         let shipInventory = []; 
-        
         let runTotalScrapValue = 0;
         let runTotalDays = 0;
 
         const terminalOutput = document.getElementById('terminal-output');
         const terminalInput = document.getElementById('terminal-input');
 
-        // --- CORE FUNCTIONS ---
-
         function initGame() {
             document.getElementById('landing-view').classList.add('hidden');
-            document.getElementById('game-over-view').classList.add('hidden');
             document.getElementById('terminal-view').classList.remove('hidden');
             terminalInput.focus();
-            
-            quotaProgress = 0;
-            quota = 1000;
-            daysLeft = 3;
-            activeMoon = null;
-            shipInventory = [];
-            runTotalScrapValue = 0;
-            runTotalDays = 0;
-            
-            terminalOutput.innerHTML = 'Welcome to the FORTUNE-9 OS terminal.\nType "HELP" for commands.\n\n';
+            terminalOutput.innerHTML = 'FORTUNE-9 OS (v4.2) INITIALIZED.\nWELCOME, EMPLOYEE.\nType "HELP" for command list.\n\n';
             updateDisplay();
         }
 
         function resetGame() {
-            initGame();
-        }
-
-        function triggerTermination() {
-            document.getElementById('terminal-view').classList.add('hidden');
-            document.getElementById('game-over-view').classList.remove('hidden');
-            
-            document.getElementById('stat-days').innerText = runTotalDays;
-            document.getElementById('stat-scrap').innerText = `$${runTotalScrapValue}`;
-            document.getElementById('stat-quota').innerText = `$${quota}`;
+            location.reload();
         }
 
         function updateDisplay() {
             document.getElementById('quota-display').innerText = `QUOTA: $${quotaProgress} / $${quota}`;
             document.getElementById('days-left-display').innerText = daysLeft;
             document.getElementById('current-moon-display').innerText = activeMoon ? activeMoon.toUpperCase() : "NONE";
-            
-            if (daysLeft === 0) {
-                document.getElementById('days-left-display').classList.remove('text-white');
-                document.getElementById('days-left-display').classList.add('red');
-            } else {
-                document.getElementById('days-left-display').classList.remove('red');
-                document.getElementById('days-left-display').classList.add('text-white');
-            }
         }
 
         function print(text, color = 'text-neon') {
-            const span = document.createElement('div');
-            span.className = color;
-            span.innerHTML = text;
-            terminalOutput.appendChild(span);
+            const div = document.createElement('div');
+            div.className = color;
+            div.innerHTML = text;
+            terminalOutput.appendChild(div);
             terminalOutput.scrollTop = terminalOutput.scrollHeight;
         }
 
@@ -335,39 +207,6 @@
             if (dataObj[term.toLowerCase()]) return term.toLowerCase();
             return keys.find(key => key.toLowerCase().startsWith(term.toLowerCase()));
         }
-
-        function calculateDeployment(moonKey) {
-            const moon = MOON_DATA[moonKey];
-            if (!moon || moon.isSpecial) return null;
-
-            const lootCount = Math.floor(Math.random() * (moon.maxScrap - moon.minScrap + 1)) + moon.minScrap;
-            
-            const indoorSpawns = [];
-            let indoorCurrent = 0;
-            const indoorList = Object.keys(BESTIARY_DATA).filter(k => BESTIARY_DATA[k].type === 'indoor');
-            while (indoorCurrent < moon.indoorPower) {
-                const entity = indoorList[Math.floor(Math.random() * indoorList.length)];
-                if (indoorCurrent + BESTIARY_DATA[entity].power <= moon.indoorPower) {
-                    indoorSpawns.push(entity.toUpperCase());
-                    indoorCurrent += BESTIARY_DATA[entity].power;
-                } else break;
-            }
-
-            const outdoorSpawns = [];
-            let outdoorCurrent = 0;
-            const outdoorList = Object.keys(BESTIARY_DATA).filter(k => BESTIARY_DATA[k].type === 'outdoor');
-            while (outdoorCurrent < moon.nightPower) {
-                const entity = outdoorList[Math.floor(Math.random() * outdoorList.length)];
-                if (outdoorCurrent + BESTIARY_DATA[entity].power <= moon.nightPower) {
-                    outdoorSpawns.push(entity.toUpperCase());
-                    outdoorCurrent += BESTIARY_DATA[entity].power;
-                } else break;
-            }
-
-            return { lootCount, indoorSpawns, outdoorSpawns };
-        }
-
-        // --- COMMAND PROCESSING ---
 
         terminalInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
@@ -383,40 +222,14 @@
 
             if (travelPending) {
                 if (input === 'confirm' || input === 'c') {
-                    const moon = MOON_DATA[travelPending];
-                    
-                    if (daysLeft <= 0 && !moon.isSpecial) {
-                        print("ERROR: NO DAYS REMAINING. MUST RETURN TO COMPANY BUILDING.", "red");
-                        travelPending = null;
-                        return;
-                    }
-
-                    if (!moon.isSpecial) {
-                        daysLeft--;
-                        runTotalDays++;
-                    }
-                    
                     activeMoon = travelPending;
-                    const report = calculateDeployment(activeMoon);
-                    
-                    print(`Routing to ${activeMoon.toUpperCase()}...`, "amber");
-                    if (moon.isSpecial) {
-                        print("Arrival at Company HQ (Gordion). Deliver scrap before the deadline.", "text-white");
-                    } else {
-                        print("Jump successful. Time remaining: " + daysLeft + " days.");
-                        print(`--- DEPLOYMENT REPORT: ${activeMoon.toUpperCase()} ---`, "text-white");
-                        print(`<span class="moon-info">ESTIMATED SCRAP PIECES:</span> ${report.lootCount}`);
-                        print(`<span class="text-red-500">INDOOR THREATS:</span> ${report.indoorSpawns.join(', ') || 'NONE'}`);
-                        print(`<span class="text-red-500">NIGHTTIME THREATS:</span> ${report.outdoorSpawns.join(', ') || 'NONE'}`);
-                    }
-                    
+                    travelPending = null;
+                    daysLeft--;
+                    print(`ROUTING TO ${activeMoon.toUpperCase()}...`, "amber");
                     updateDisplay();
-                    travelPending = null;
-                } else if (input === 'deny' || input === 'd') {
-                    print("Travel cancelled.");
-                    travelPending = null;
                 } else {
-                    print("PLEASE SELECT [C]ONFIRM OR [D]ENY TO PROCEED.", "amber");
+                    travelPending = null;
+                    print("TRAVEL ABORTED.");
                 }
                 return;
             }
@@ -427,170 +240,58 @@
             switch(cmd) {
                 case 'help':
                     print(`AVAILABLE COMMANDS:
-[MOONS]      - List moons and prices
-[ROUTE]      - Travel to a moon (e.g. ROUTE TIT)
-[SCRAP]      - Add found loot (e.g. SCR ENGINE)
-[VIEW SCRAP] - See collected scrap on ship
-[INV]        - View ship inventory
-[SELL]       - View Sell Page (Must be at Company on Day 0)
-[SELL ALL]   - Liquidate inventory (Must be at Company)
-[STATUS]     - Check orbital status and days
-[CLEAR]      - Clear screen`);
+------------------------------------
+[MOONS]      - List moons and hazards
+[ROUTE]      - Travel to a moon
+[SCRAP]      - Log found loot (e.g. SCRAP CUP)
+[STATUS]     - Check quota and ship storage
+[RULES]      - RE-ROUTE: Access Contract Rules
+[SOUNDBOARD] - RE-ROUTE: Access Entity Audio
+[CLEAR]      - Wipe console buffer`);
+                    break;
+
+                case 'rules':
+                    print("INITIATING PAGE JUMP: RULES.HTML...", "amber");
+                    setTimeout(() => { window.location.href = 'rules.html'; }, 800);
+                    break;
+
+                case 'soundboard':
+                case 'index':
+                    print("INITIATING PAGE JUMP: INDEX.HTML...", "amber");
+                    setTimeout(() => { window.location.href = 'index.html'; }, 800);
                     break;
 
                 case 'moons':
                     print("--- MOON DATABASE ---");
-                    Object.keys(MOON_DATA).forEach(k => {
-                        const m = MOON_DATA[k];
-                        print(`${k.toUpperCase().padEnd(15)} | Hazard: ${m.hazard} | Cost: $${m.cost}`);
-                    });
+                    Object.keys(MOON_DATA).forEach(k => print(`${k.toUpperCase().padEnd(15)} | Hazard: ${MOON_DATA[k].hazard}`));
                     break;
 
                 case 'route':
-                    if (args.length < 2) {
-                        print("Usage: ROUTE [NAME]");
+                    const target = findPartialMatch(MOON_DATA, args[1]);
+                    if (target) {
+                        travelPending = target;
+                        print(`CONFIRM ROUTE TO ${target.toUpperCase()}? [C]ONFIRM/[D]ENY`, "amber");
                     } else {
-                        const target = findPartialMatch(MOON_DATA, args[1]);
-                        if (target) {
-                            travelPending = target;
-                            print(`TRAVEL REQUEST: ${target.toUpperCase()}`, "amber");
-                            const timeCost = MOON_DATA[target].isSpecial ? 0 : 1;
-                            print(`Cost: $${MOON_DATA[target].cost} | Time Cost: ${timeCost} Day`);
-                            print("Select [C]ONFIRM or [D]ENY.");
-                        } else {
-                            print(`Unknown moon: "${args[1]}"`, "red");
-                        }
-                    }
-                    break;
-
-                case 'view':
-                    if (args[1] === 'scrap') {
-                        if (shipInventory.length === 0) {
-                            print("Ship inventory is empty.");
-                        } else {
-                            let totalVal = 0;
-                            print("--- COLLECTED SCRAP ON SHIP ---", "amber");
-                            shipInventory.forEach(item => {
-                                print(`${item.name.toUpperCase().padEnd(20)} : $${item.value}`);
-                                totalVal += item.value;
-                            });
-                            print("-----------------------");
-                            print(`TOTAL VALUE: $${totalVal}`, "text-white");
-                        }
-                    } else {
-                        print("Usage: VIEW SCRAP");
-                    }
-                    break;
-
-                case 'inv':
-                case 'inventory':
-                    if (shipInventory.length === 0) {
-                        print("Ship inventory is empty.");
-                    } else {
-                        let totalVal = 0;
-                        print("--- SHIP INVENTORY ---", "amber");
-                        shipInventory.forEach(item => {
-                            print(`${item.name.toUpperCase().padEnd(20)} : $${item.value}`);
-                            totalVal += item.value;
-                        });
-                        print("-----------------------");
-                        print(`TOTAL SHIP VALUE: $${totalVal}`, "text-white");
-                    }
-                    break;
-
-                case 'sell':
-                    if (args[1] === 'all') {
-                        if (activeMoon !== 'company') {
-                            print("ERROR: MUST BE IN ORBIT OF 'COMPANY' BUILDING TO SELL.", "red");
-                        } else if (daysLeft > 0) {
-                            print(`ERROR: THE COMPANY ONLY ACCEPTS DELIVERIES ON THE FINAL DAY (DAYS LEFT: 0).`, "red");
-                        } else {
-                            const sum = shipInventory.reduce((acc, item) => acc + item.value, 0);
-                            quotaProgress += sum;
-                            runTotalScrapValue += sum;
-                            shipInventory = [];
-                            print(`TRANSACTION COMPLETE. SOLD ALL ITEMS FOR $${sum}.`, "text-neon font-bold");
-                            
-                            if (quotaProgress >= quota) {
-                                print("--- QUOTA SUCCESSFUL ---", "text-neon font-bold");
-                                quota = Math.floor(quota * 1.12);
-                                quotaProgress = 0;
-                                daysLeft = 3;
-                                print(`NEW QUOTA ASSIGNED: $${quota}`, "amber");
-                                print("Time reset: 3 Days remaining.");
-                            } else {
-                                print("--- QUOTA FAILURE ---", "red");
-                                print(`Current: $${quotaProgress} / Goal: $${quota}`);
-                                print("Commencing disciplinary action...");
-                                setTimeout(triggerTermination, 2000);
-                            }
-                            updateDisplay();
-                        }
-                    } else {
-                        if (activeMoon !== 'company') {
-                            print("ERROR: MUST BE IN ORBIT OF 'COMPANY' BUILDING TO SELL.", "red");
-                        } else if (daysLeft > 0) {
-                            print(`ERROR: THE COMPANY ONLY ACCEPTS DELIVERIES ON THE FINAL DAY (DAYS LEFT: 0).`, "red");
-                        } else {
-                            print("--- COMPANY SELL PAGE ---", "amber");
-                            if (shipInventory.length === 0) {
-                                print("No items in inventory to sell.");
-                            } else {
-                                shipInventory.forEach((item, idx) => {
-                                    print(`[${idx+1}] ${item.name.toUpperCase().padEnd(20)} : $${item.value}`);
-                                });
-                                print("--------------------------");
-                                print("Type [SELL ALL] to submit your entire cargo.", "amber");
-                            }
-                        }
+                        print("UNKNOWN MOON COORDINATES.", "red");
                     }
                     break;
 
                 case 'status':
-                    const shipVal = shipInventory.reduce((acc, item) => acc + item.value, 0);
-                    print(`--- ORBITAL STATUS ---`);
-                    print(`Current Moon: ${activeMoon ? activeMoon.toUpperCase() : "NONE"}`);
-                    print(`Days Remaining: ${daysLeft}`);
-                    print(`Quota Progress: $${quotaProgress} / $${quota}`);
-                    print(`Ship Storage Value: $${shipVal}`);
-                    print(`Run Stats: $${runTotalScrapValue} total collected / ${runTotalDays} days.`);
+                    const totalVal = shipInventory.reduce((sum, item) => sum + item.value, 0);
+                    print(`--- SHIP STATUS ---`);
+                    print(`LOCATION: ${activeMoon ? activeMoon.toUpperCase() : "ORBIT"}`);
+                    print(`QUOTA: $${quotaProgress} / $${quota}`);
+                    print(`CARGO VALUE: $${totalVal}`);
                     break;
 
-                case 'scr':
                 case 'scrap':
-                    if (args.length > 1) {
-                        const term = args.slice(1).join(' ');
-                        const matchKey = findPartialMatch(SCRAP_DATA, term);
-                        if (matchKey) {
-                            const range = SCRAP_DATA[matchKey];
-                            const value = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
-                            shipInventory.push({ name: matchKey, value: value });
-                            print(`LOGGED: ${matchKey.toUpperCase()} ($${value}) - ADDED TO SHIP STORAGE`, 'amber');
-                        } else {
-                            print(`Scrap item "${term}" not found.`, 'red');
-                        }
+                    const itemMatch = findPartialMatch(SCRAP_DATA, args.slice(1).join(' '));
+                    if (itemMatch) {
+                        const val = Math.floor(Math.random() * (SCRAP_DATA[itemMatch][1] - SCRAP_DATA[itemMatch][0] + 1)) + SCRAP_DATA[itemMatch][0];
+                        shipInventory.push({ name: itemMatch, value: val });
+                        print(`LOGGED ${itemMatch.toUpperCase()}: VALUE $${val}`, "amber");
                     } else {
-                        print("Usage: SCRAP [NAME]");
-                    }
-                    break;
-
-                case 'bes':
-                case 'bestiary':
-                    if (args.length > 1) {
-                        const term = args.slice(1).join(' ');
-                        const matchKey = findPartialMatch(BESTIARY_DATA, term);
-                        if (matchKey) {
-                            const info = BESTIARY_DATA[matchKey];
-                            print(`--- FILE: ${matchKey.toUpperCase()} ---`, 'amber');
-                            print(`<span class="text-white">DESC:</span> ${info.desc}`);
-                            print(`<span class="text-white">POWER:</span> ${info.power}`);
-                            print(`<span class="text-neon">PROTOCOL:</span> ${info.rules}`);
-                        } else {
-                            print("Entity not found.", "red");
-                        }
-                    } else {
-                        print("BESTIARY:");
-                        Object.keys(BESTIARY_DATA).forEach(k => print(`- ${k.toUpperCase()}`));
+                        print("ITEM NOT RECOGNIZED.", "red");
                     }
                     break;
 
@@ -599,7 +300,7 @@
                     break;
 
                 default:
-                    print(`Unknown command: "${cmd}". Type "HELP" for info.`, 'red');
+                    print(`INVALID COMMAND: "${cmd}". TYPE "HELP".`, 'red');
             }
         }
     </script>
